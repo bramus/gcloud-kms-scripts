@@ -45,6 +45,14 @@ shift "$((OPTIND - 1))"
   plaintext=$(cat -);
 }
 
+# if no <plaintext> is passed as an argument, ask for one
+[ "$plaintext" == "" ] && {
+  echo -e "Please enter a plaintext string to encrypt"
+  echo -ne "\a> "
+  read
+  [ -n "$REPLY" ] && plaintext=$REPLY
+}
+
 [ "$plaintext" == "" ] && {
   (>&2 echo 'Error: Missing Plaintext');
   echo;

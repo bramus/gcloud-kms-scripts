@@ -45,6 +45,14 @@ shift "$((OPTIND - 1))"
   secret=$(cat -);
 }
 
+# if no <secret> is passed as an argument, ask for one
+[ "$plaintext" == "" ] && {
+  echo -e "Please enter a secret to decrypt"
+  echo -ne "\a> "
+  read
+  [ -n "$REPLY" ] && secret=$REPLY
+}
+
 [ "$secret" == "" ] && {
   (>&2 echo 'Error: Missing Secret');
   echo;

@@ -13,6 +13,21 @@ Each script can be invoked with `-h` to see it's usage.
 
 ### Encrypt
 
+
+```bash
+kms-encrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]"
+```
+
+`kms-decrypt` will ask for a secret to decrypt and yield the result:
+
+```
+Please enter a plaintext string to encrypt
+> test
+CiQAUqQA4o9w4O3ovBCcj…
+```
+
+Alternatively, you can pass plaintext string to encrypt into `kms-encrypt`:
+
 ```bash
 kms-encrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]" -p test
 # "CiQAUqQA4o9w4O3ovBCcj…"
@@ -26,12 +41,27 @@ echo -n test | kms-encrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRin
 ### Decrypt
 
 ```bash
+kms-decrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]"
+```
+
+`kms-decrypt` will ask for a secret to decrypt and yield the result:
+
+```
+Please enter a secret to decrypt
+> CiQAUqQA4o9w4O3ovBCcj…
+test
+```
+
+Alternatively, you can pass secret to decrypt into `kms-decrypt`:
+
+```bash
 kms-decrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]" -s "CiQAUqQA4o9w4O3ovBCcj…"
 # test
 ```
 
 ```bash
 echo -n "CiQAUqQA4o9w4O3ovBCcj…" | kms-decrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]"
+# test
 ```
 
 ## License
