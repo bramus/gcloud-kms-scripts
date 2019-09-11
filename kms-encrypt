@@ -1,0 +1,66 @@
+#!/bin/bash -e
+
+hash gcloud &>/dev/null || {
+  (>&2 echo 'Error: gcloud not found on PATH');
+  exit 1;
+}
+
+function usage {
+  echo 'Usage:' $(basename "$0") '-r <key_ring_id> -p <plaintext>'
+  echo '   or: echo <plaintext> |' $(basename "$0") '-r <key_ring_id>'
+}
+
+while getopts r:p:h FLAG; do
+  case $FLAG in
+    r)
+      key_ring_id=$OPTARG
+      ;;
+    p)
+      plaintext=$OPTARG
+      ;;
+    h)
+      usage
+      exit
+      ;;
+    ?)
+      echo
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+[ "$key_ring_id" == "" ] && {
+  (>&2 echo 'Error: Missing Key Ring ID');
+  echo;
+  usage;
+  exit 1;
+}
+
+# if no <plaintext> is passed as an argument, try getting it from stdin if we're
+# not interactive
+[ "$plaintext" == "" ] && [ ! -t 0 ] && {
+  plaintext=$(cat -);
+}
+
+[ "$plaintext" == "" ] && {
+  (>&2 echo 'Error: Missing Plaintext');
+  echo;
+  usage;
+  exit 1;
+}
+
+# Split key_ring_id on /
+IFS='/' read -ra key_ring_parts <<< "$key_ring_id"
+
+# @ref https://cloud.google.com/kms/docs/encrypt-decrypt#kms-howto-encrypt-cli
+echo -n "$plaintext" | gcloud kms encrypt \
+--project "${key_ring_parts[1]}" \
+--location "${key_ring_parts[3]}" \
+--keyring "${key_ring_parts[5]}" \
+--key "${key_ring_parts[7]}" \
+--plaintext-file - \
+--ciphertext-file - \
+| base64

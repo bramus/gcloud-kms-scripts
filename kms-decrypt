@@ -1,0 +1,67 @@
+#!/bin/bash
+
+hash gcloud &>/dev/null || {
+  (>&2 echo 'Error: gcloud not found on PATH');
+  exit 1;
+}
+
+function usage {
+  echo 'Usage:' $(basename "$0") '-r <key_ring_id> -s <secret>'
+  echo '   or: echo <secret> |' $(basename "$0") '-r <key_ring_id>'
+}
+
+while getopts r:s:h FLAG; do
+  case $FLAG in
+    r)
+      key_ring_id=$OPTARG
+      ;;
+    s)
+      secret=$OPTARG
+      ;;
+    h)
+      usage
+      exit
+      ;;
+    ?)
+      echo
+      usage
+      exit 1
+      ;;
+  esac
+done
+
+shift "$((OPTIND - 1))"
+
+[ "$key_ring_id" == "" ] && {
+  (>&2 echo 'Error: Missing Key Ring ID');
+  echo;
+  usage;
+  exit 1;
+}
+
+# if no <secret> is passed as an argument, try getting it from stdin if we're
+# not interactive
+[ "$secret" == "" ] && [ ! -t 0 ] && {
+  secret=$(cat -);
+}
+
+[ "$secret" == "" ] && {
+  (>&2 echo 'Error: Missing Secret');
+  echo;
+  usage;
+  exit 1;
+}
+
+# Split key_ring_id on /
+IFS='/' read -ra key_ring_parts <<< "$key_ring_id"
+
+# @ref https://cloud.google.com/kms/docs/encrypt-decrypt#decrypt
+(echo -n "$secret" | base64 --decode) | gcloud kms decrypt \
+--project "${key_ring_parts[1]}" \
+--location "${key_ring_parts[3]}" \
+--keyring "${key_ring_parts[5]}" \
+--key "${key_ring_parts[7]}" \
+--ciphertext-file - \
+--plaintext-file -
+
+echo
