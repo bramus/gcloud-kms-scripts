@@ -46,7 +46,7 @@ shift "$((OPTIND - 1))"
 }
 
 # if no <secret> is passed as an argument, ask for one
-[ "$plaintext" == "" ] && {
+[ "$secret" == "" ] && {
   echo -e "Please enter a secret to decrypt"
   echo -ne "\a> "
   read
