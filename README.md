@@ -18,7 +18,7 @@ Each script can be invoked with `-h` to see it's usage.
 kms-encrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]"
 ```
 
-`kms-decrypt` will ask for a secret to decrypt and yield the result:
+`kms-encrypt` will ask for a plaintext string to encrypt and yield the encrypted result:
 
 ```
 Please enter a plaintext string to encrypt
@@ -44,7 +44,7 @@ echo -n test | kms-encrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRin
 kms-decrypt -r "projects/[PROJECT_ID]/locations/[LOCATION]/keyRings/[keyring_name]/cryptoKeys/[key_name]"
 ```
 
-`kms-decrypt` will ask for a secret to decrypt and yield the result:
+`kms-decrypt` will ask for a secret to decrypt and yield the plaintext result:
 
 ```
 Please enter a secret to decrypt
